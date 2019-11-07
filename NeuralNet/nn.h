@@ -1,3 +1,6 @@
+#ifndef __NN_H
+#define __NN_H
+
 #include<vector>
 #include<cstdlib>
 #include<cassert>
@@ -63,7 +66,7 @@ class Layer{
         vector<Perceptron> perceptrons;
     public:
         Layer(const int layerNum, const int numPerceptrons,const int numOutput, activationFunc f);
-        unsigned int size();
+        unsigned long int size();
         Perceptron &operator[] (int idx);
         Perceptron back();
         Perceptron front();
@@ -92,3 +95,5 @@ typedef class MultiLayerPerceptron {
         void backProp(const vector<double> &outputVals);
         void getResults(vector<double> &results);
 } MLP;
+
+#endif

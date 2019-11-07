@@ -1,18 +1,21 @@
 CC = g++
 CCFLAGS = -g -Wall -Wpedantic
-DEFINES = __NO_DEBUG __MY_OWN_DATA_ELE 
+DEFINES = __NO_DEBUG  
 
-MAIN_FILE = ./driver.cpp
 
 DEFINE_ARGS = $(addprefix -D ,$(DEFINES))
 GCC_CMD = $(CC) $(CCFLAGS) $(DEFINE_ARGS) 
 
-all: objects main
+MAIN_FILE = ./driver.cpp
+ALL_CFILES = nn.cpp training.cpp
+ALL_OFILES = $(addsuffix .o, $(basename $(ALL_CFILES)))
 
-objects: nn.cpp 
-	$(GCC_CMD) nn.cpp -c -o nn.o
+all: main
 
-main: $(MAIN_FILE)
+%.o: %.cpp $(ALL_CFILES)
+	$(GCC_CMD) -c -o $@ $<
+
+main: $(MAIN_FILE) $(ALL_OFILES)
 	$(GCC_CMD) $(MAIN_FILE) nn.o -o driver
 
 clean:

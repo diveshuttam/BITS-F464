@@ -40,9 +40,10 @@ double Perceptron::d_tanh(double x){
 }
 double Perceptron::sumDNext(Layer &nextLayer){
     double sum=0.0;
-    for(int i=0;i<nextLayer.size()-1;i++){
+    for(unsigned long int i=0;i<nextLayer.size()-1;i++){
         sum+=outputConnections[i].weight * nextLayer[i].gradient;
     }
+    return sum;
 }
 Perceptron::Perceptron(int pNum, int layerNum, const int numOutput, activationFunc f){
     this->perceptronNum=pNum;
@@ -91,7 +92,7 @@ void Perceptron::setActivationFunc(activationFunc f){
 }
 void Perceptron::feedForward(Layer &prevLayer){
     double sum=0;
-    for(int i=0;i<prevLayer.size();i++){
+    for(unsigned long int i=0;i<prevLayer.size();i++){
         sum+=prevLayer[i].getWeight(perceptronNum)*prevLayer[i].getOutputVal();
     }
     this->outputVal=f_activate(sum);
@@ -108,7 +109,7 @@ void Perceptron::calcHiddenGradient(Layer &nextLayer){
 // eta is the learning rate
 // alpha is the momentum
 void Perceptron::updateWeights(Layer &prevLayer, double eta, double alpha){
-    for(int i=0;i<prevLayer.size();++i){
+    for(unsigned long int i=0;i<prevLayer.size();++i){
         Perceptron &prevPerceptron=prevLayer[i];
         double prevDelta = prevPerceptron.outputConnections[this->perceptronNum].deltaWeight;
         double newDelta = 
@@ -132,7 +133,7 @@ Layer::Layer(const int layerNum, const int numPerceptrons,const int numOutput, a
         perceptrons.push_back(Perceptron(p,layerNum, numOutput,f));
     }
 }
-unsigned int Layer::size(){
+unsigned long int Layer::size(){
     return perceptrons.size();
 }
 Perceptron &Layer::operator [] (int idx){
@@ -148,17 +149,17 @@ void Layer::feedForward(Layer &prevLayer){
     //initialize sum to 0
 
     //dont feed forward bias neuron
-    for(int i=0;i<this->perceptrons.size()-1;i++){
+    for(long unsigned int i=0;i<this->perceptrons.size()-1;i++){
         perceptrons[i].feedForward(prevLayer);
     }
 }
 void Layer::calcHiddenGradient(Layer &nextLayer){
-    for(int i=0;i<perceptrons.size();i++){
+    for(long unsigned int i=0;i<perceptrons.size();i++){
         perceptrons[i].calcHiddenGradient(nextLayer);
     }
 }
 void Layer::updateWeights(Layer &prevLayer, double eta, double alpha){
-    for(int i=0;i<perceptrons.size()-1;i++){
+    for(long unsigned int i=0;i<perceptrons.size()-1;i++){
         perceptrons[i].updateWeights(prevLayer, eta, alpha);
     }
 }
@@ -169,7 +170,7 @@ void Layer::updateWeights(Layer &prevLayer, double eta, double alpha){
 @param LayerDim[i] represents number of perceptrons in Layer[i]
 */
 MultiLayerPerceptron::MultiLayerPerceptron(const Topology &t,activationFunc f, int runningSamplesCount, double eta, double alpha){
-    unsigned int numLayers=t.size();
+    int numLayers=t.size();
     currentError=0.0;
     averageError=0.0;
     this->runningSamplesCount=runningSamplesCount;
@@ -211,7 +212,7 @@ void MultiLayerPerceptron::backProp(const vector<double> &outputVals){
     Layer &outputLayer = layers.back();
     double loss = 0;
     // not include the bias
-    for(int i=0;i<outputLayer.size()-1;i++){
+    for(unsigned long int i=0;i<outputLayer.size()-1;i++){
         loss+=pow((outputLayer[i].getOutputVal()-outputVals[i]),2);
     }
     loss=sqrt(loss);
@@ -219,19 +220,19 @@ void MultiLayerPerceptron::backProp(const vector<double> &outputVals){
     averageError=(averageError*(runningSamplesCount-1)+currentError)/runningSamplesCount;
 
     // output layer gradients
-    for(int i=0;i<outputLayer.size()-1;i++){
+    for(unsigned long int i=0;i<outputLayer.size()-1;i++){
         outputLayer[i].calcOutputGradient(outputVals[i]);
     }
 
     // hidden layer gradients
-    for(int i=layers.size()-2;i>0;i--){
+    for(unsigned long int i=layers.size()-2;i>0;i--){
         Layer &currentLayer = layers[i];
         Layer &nextLayer = layers[i+1];
         currentLayer.calcHiddenGradient(nextLayer);
     }
 
     // update weights
-    for(int i=layers.size()-1;i>0;i--){
+    for(unsigned long int i=layers.size()-1;i>0;i--){
         Layer &currentLayer = layers[i];
         Layer &prevLayer = layers[i-1];
         currentLayer.updateWeights(prevLayer, eta, alpha);
@@ -240,7 +241,7 @@ void MultiLayerPerceptron::backProp(const vector<double> &outputVals){
 void MultiLayerPerceptron::getResults(vector<double> &results){
     Layer &outputLayer = layers.back();
     results.clear();
-    for(int i=0;i<outputLayer.size()-1;i++){
+    for(unsigned long int i=0;i<outputLayer.size()-1;i++){
         results.push_back(outputLayer[i].getOutputVal());
     }
 }
