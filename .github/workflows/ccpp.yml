@@ -9,7 +9,6 @@ jobs:
     
     steps:
     - uses: actions/checkout@v1
-    - name: change-dir
-      run: cd NeuralNet
     - name: make
       run: make
+      working-directory: ./NeuralNet
